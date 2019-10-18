@@ -1,4 +1,6 @@
 ﻿using System;
+using _0xTrader.Core;
+using Nethereum.Web3;
 
 namespace ConsoleApp
 {
@@ -6,7 +8,9 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var web3 = new Web3();
+            var bls = new BlockchainListenerService(web3);
+            bls.StartListeningAsync().Wait();
         }
     }
 }
