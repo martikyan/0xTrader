@@ -1,22 +1,34 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using _0xTrader.Core;
-using _0xTrader.Core.Services;
+using _0xTrader.Core.Services.Abstractions;
+using Castle.Windsor;
 using Nethereum.Web3;
 
 namespace ConsoleApp
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var web3 = new Web3();
-            var config = new CoreConfiguration();
-            var bls = new BlockchainListenerService(config, web3);
-            bls.StartListeningAsync().Wait();
+            MainAsync(args).Wait();
+        }
 
-            //var ba = new BlockchainAccessorService(web3);
-            //var repo = new RepoAccessorService(ba);
-            //repo.RegisterTokenAsync("0xdAC17F958D2ee523a2206206994597C13D831ec7").Wait();
+        public static async Task MainAsync(string[] args)
+        {
+            using (var container = new WindsorContainer())
+            {
+                container.Install(new CoreInstaller());
+                var bl = container.Resolve<IBlockchainListener>();
+                bl.OnTrade += Bl_OnUserTraded;
+                await bl.StartListeningAsync();
+            }
+        }
+
+        private static void Bl_OnUserTraded(object sender, UserTradedEventArgs e)
+        {
+            Console.WriteLine("Trader Found!");
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Numerics;
 namespace _0xTrader.Core.Models
 {
     [Event("Transfer")]
-    public class TransferEventDTO : IEventDTO
+    public class TransferEvent : IEventDTO
     {
         [Parameter("address", "_from", 1, true)]
         public string From { get; set; }

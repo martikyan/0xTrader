@@ -1,11 +1,12 @@
-﻿using Nethereum.Util;
+﻿using _0xTrader.Core.Models;
+using Nethereum.Util;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _0xTrader.Core.Services
+namespace _0xTrader.Core.Services.Abstractions
 {
     public interface IBlockchainAccessor
     {

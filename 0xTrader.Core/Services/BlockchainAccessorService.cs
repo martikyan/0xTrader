@@ -1,9 +1,9 @@
 ﻿using _0xTrader.Core.Helpers;
+using _0xTrader.Core.Models;
+using _0xTrader.Core.Services.Abstractions;
 using Nethereum.Web3;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace _0xTrader.Core.Services
@@ -11,10 +11,12 @@ namespace _0xTrader.Core.Services
     public class BlockchainAccessorService : IBlockchainAccessor
     {
         private readonly IWeb3 _web3;
+        private readonly CoreConfiguration _config;
 
-        public BlockchainAccessorService(IWeb3 web3)
+        public BlockchainAccessorService(IWeb3 web3, CoreConfiguration configuration)
         {
             _web3 = web3 ?? throw new ArgumentNullException(nameof(web3));
+            _config = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public async Task<BigInteger> GetBalanceAsync(string tokenAddress, string ownerAddress)

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace _0xTrader.Core.Services
+namespace _0xTrader.Core.Services.Abstractions
 {
     public interface IBlockchainListener
     {
-        event EventHandler<UserTradedEventArgs> OnUserTraded;
+        event EventHandler<UserTradedEventArgs> OnTrade;
         Task StartListeningAsync();
         Task StopListeningAsync();
     }

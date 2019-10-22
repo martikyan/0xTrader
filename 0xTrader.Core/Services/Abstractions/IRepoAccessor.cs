@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _0xTrader.Core.Services
+namespace _0xTrader.Core.Services.Abstractions
 {
     public interface IRepoAccessor
     {
