@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using _0xTrader.Core;
+﻿using _0xTrader.Core;
 using _0xTrader.Core.Services.Abstractions;
 using Castle.Windsor;
-using Nethereum.Web3;
+using System;
+using System.Threading.Tasks;
 
 namespace ConsoleApp
 {
@@ -21,12 +19,12 @@ namespace ConsoleApp
             {
                 container.Install(new CoreInstaller());
                 var bl = container.Resolve<IBlockchainListener>();
-                bl.OnTrade += Bl_OnUserTraded;
+                bl.OnTrade += Bl_OnTrade;
                 await bl.StartListeningAsync();
             }
         }
 
-        private static void Bl_OnUserTraded(object sender, UserTradedEventArgs e)
+        private static void Bl_OnTrade(object sender, OnTradeEventArgs e)
         {
             Console.WriteLine("Trader Found!");
         }

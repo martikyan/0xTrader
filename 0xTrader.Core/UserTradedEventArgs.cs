@@ -3,11 +3,11 @@ using System;
 
 namespace _0xTrader.Core
 {
-    public class UserTradedEventArgs : EventArgs
+    public class OnTradeEventArgs : EventArgs
     {
         public Trade Trade { get; set; }
 
-        public UserTradedEventArgs()
+        public OnTradeEventArgs()
             : base()
         {
         }

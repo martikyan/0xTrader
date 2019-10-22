@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using _0xTrader.Core.Models;
+﻿using _0xTrader.Core.Models;
 using _0xTrader.Core.Services.Abstractions;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace _0xTrader.Core.Services
 {

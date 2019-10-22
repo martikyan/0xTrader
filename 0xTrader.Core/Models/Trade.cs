@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace _0xTrader.Core.Models
+﻿namespace _0xTrader.Core.Models
 {
     public class Trade
     {
@@ -10,6 +6,5 @@ namespace _0xTrader.Core.Models
         public Token Token2 { get; set; }
         public Trader Token1Holder { get; set; }
         public Trader Token2Holder { get; set; }
-        public DateTimeOffset ExchangeDate { get; set; }
     }
 }

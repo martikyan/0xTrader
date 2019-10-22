@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using _0xTrader.Core.Helpers;
-using _0xTrader.Core.Models;
+﻿using _0xTrader.Core.Models;
 using _0xTrader.Core.Services.Abstractions;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
-using Nethereum.RPC.Web3;
-using Nethereum.Util;
 using Nethereum.Web3;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace _0xTrader.Core.Services
 {
@@ -20,8 +16,11 @@ namespace _0xTrader.Core.Services
         private readonly CoreConfiguration _config;
         private readonly IBlockchainAccessor _blockchainAccessor;
         private readonly IWeb3 _web3;
+
         private long _lastScannedBlock = 5106317;
-        public event EventHandler<UserTradedEventArgs> OnTrade;
+        private bool _isStarted = false;
+
+        public event EventHandler<OnTradeEventArgs> OnTrade;
 
         public BlockchainListenerService(CoreConfiguration config, IBlockchainAccessor blockchainAccessor, IWeb3 web3)
         {
@@ -32,6 +31,12 @@ namespace _0xTrader.Core.Services
 
         public async Task StartListeningAsync()
         {
+            if (_isStarted)
+            {
+                throw new InvalidOperationException($"The {nameof(BlockchainListenerService)} was already started.");
+            }
+
+            _isStarted = true;
             while (true)
             {
                 await RetreiveUnscannedBlocks();
@@ -69,6 +74,7 @@ namespace _0xTrader.Core.Services
 
         public Task StopListeningAsync()
         {
+            _isStarted = false;
             return Task.CompletedTask;
         }
 
@@ -92,7 +98,7 @@ namespace _0xTrader.Core.Services
                         eo.Log.Address != ei.Log.Address)
                     {
                         var trade = await ConstructTradeFromEvents(eo, ei);
-                        OnTrade?.Invoke(this, new UserTradedEventArgs() { Trade = trade });
+                        OnTrade?.Invoke(this, new OnTradeEventArgs() { Trade = trade });
                     }
                 }
             }
@@ -115,7 +121,6 @@ namespace _0xTrader.Core.Services
 
             var trade = new Trade()
             {
-                ExchangeDate = DateTimeOffset.UtcNow,
                 Token1 = token1,
                 Token2 = token2,
                 Token1Holder = token1Holder,
@@ -136,6 +141,6 @@ namespace _0xTrader.Core.Services
             };
 
             return token;
-        } 
+        }
     }
 }

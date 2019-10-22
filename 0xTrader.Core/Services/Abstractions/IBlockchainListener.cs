@@ -5,8 +5,10 @@ namespace _0xTrader.Core.Services.Abstractions
 {
     public interface IBlockchainListener
     {
-        event EventHandler<UserTradedEventArgs> OnTrade;
+        event EventHandler<OnTradeEventArgs> OnTrade;
+
         Task StartListeningAsync();
+
         Task StopListeningAsync();
     }
 }

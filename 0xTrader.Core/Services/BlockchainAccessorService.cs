@@ -1,5 +1,4 @@
 ﻿using _0xTrader.Core.Helpers;
-using _0xTrader.Core.Models;
 using _0xTrader.Core.Services.Abstractions;
 using Nethereum.Web3;
 using System;
