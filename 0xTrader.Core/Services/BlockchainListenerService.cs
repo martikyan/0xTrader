@@ -49,7 +49,7 @@ namespace _0xTrader.Core.Services
 
             if (_lastScannedBlock >= lastBlockNumber)
             {
-                await Task.Delay(1000);
+                await Task.Delay(TimeSpan.FromSeconds(_config.BlockScanThresholdSeconds));
                 return;
             }
 
@@ -81,6 +81,11 @@ namespace _0xTrader.Core.Services
         private async Task HandleTransactionEventsAsync(string txHash)
         {
             var receipt = await _web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(txHash);
+            if (receipt.Status.Value.IsZero)
+            {
+                return;
+            }
+
             var events = receipt.DecodeAllEvents<TransferEvent>();
             events = events.Where(e => e.Event.From != e.Event.To).ToList();
 
