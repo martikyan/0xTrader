@@ -97,24 +97,26 @@ namespace _0xTrader.Core.Services
                         eo.Event.To == ei.Event.From &&
                         eo.Log.Address != ei.Log.Address)
                     {
-                        var trade = await ConstructTradeFromEvents(eo, ei);
+                        var trade = await ConstructTradeFromEvents(eo, ei, receipt);
                         OnTrade?.Invoke(this, new OnTradeEventArgs() { Trade = trade });
                     }
                 }
             }
         }
 
-        private async Task<Trade> ConstructTradeFromEvents(EventLog<TransferEvent> eventLog1, EventLog<TransferEvent> eventLog2)
+        private async Task<Trade> ConstructTradeFromEvents(EventLog<TransferEvent> eventLog1, EventLog<TransferEvent> eventLog2, TransactionReceipt receipt)
         {
             var token1 = await GetTokenByAddress(eventLog1.Log.Address);
             var token2 = await GetTokenByAddress(eventLog2.Log.Address);
             var token1Holder = new Trader()
             {
+                Token = token1,
                 Address = eventLog1.Event.To,
                 Balance = await _blockchainAccessor.GetBalanceAsync(eventLog1.Log.Address, eventLog1.Event.To),
             };
             var token2Holder = new Trader()
             {
+                Token = token2,
                 Address = eventLog2.Event.To,
                 Balance = await _blockchainAccessor.GetBalanceAsync(eventLog2.Log.Address, eventLog2.Event.To),
             };
@@ -125,6 +127,8 @@ namespace _0xTrader.Core.Services
                 Token2 = token2,
                 Token1Holder = token1Holder,
                 Token2Holder = token2Holder,
+                TransactionHash = receipt.TransactionHash,
+                TradeBlockNumber = (long)receipt.BlockNumber.Value,
             };
 
             return trade;

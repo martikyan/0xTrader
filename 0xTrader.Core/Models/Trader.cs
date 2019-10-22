@@ -5,6 +5,7 @@ namespace _0xTrader.Core.Models
     public class Trader
     {
         public string Address { get; set; }
+        public Token Token { get; set; }
         public BigInteger Balance { get; set; }
     }
 }

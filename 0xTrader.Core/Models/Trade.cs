@@ -6,5 +6,7 @@
         public Token Token2 { get; set; }
         public Trader Token1Holder { get; set; }
         public Trader Token2Holder { get; set; }
+        public long TradeBlockNumber { get; set; }
+        public string TransactionHash { get; set; }
     }
 }
