@@ -1,7 +1,6 @@
-﻿using _0xTrader.Core.Models;
-using System;
+﻿using System;
 
-namespace _0xTrader.Core
+namespace _0xTrader.Core.Models
 {
     public class OnTradeEventArgs : EventArgs
     {

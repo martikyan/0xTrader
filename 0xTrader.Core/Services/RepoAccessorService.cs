@@ -29,13 +29,11 @@ namespace _0xTrader.Core.Services
 
         public async Task RegisterTokenAsync(string tokenAddress)
         {
-            var token = new Token()
+            var (success, token) = await _blockchainAccessor.TryGetTokenAsync(tokenAddress);
+            if (!success)
             {
-                Address = tokenAddress,
-                Name = await _blockchainAccessor.GetNameAsync(tokenAddress),
-                Symbol = await _blockchainAccessor.GetSymbolAsync(tokenAddress),
-                Decimals = await _blockchainAccessor.GetDecimalsAsync(tokenAddress),
-            };
+                throw new InvalidOperationException($"The address {tokenAddress} does not seem to be a token.");
+            }
 
             await RegisterTokenAsync(token);
         }

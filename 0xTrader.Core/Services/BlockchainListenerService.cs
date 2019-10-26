@@ -5,6 +5,7 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace _0xTrader.Core.Services
         private readonly IBlockchainAccessor _blockchainAccessor;
         private readonly IWeb3 _web3;
 
-        private long _lastScannedBlock = 5106317;
+        private long _lastScannedBlock = 8800724;
         private bool _isStarted = false;
 
         public event EventHandler<OnTradeEventArgs> OnTrade;
@@ -103,6 +104,21 @@ namespace _0xTrader.Core.Services
                         eo.Log.Address != ei.Log.Address)
                     {
                         var trade = await ConstructTradeFromEvents(eo, ei, receipt);
+                        if (trade == null)
+                        {
+                            continue;
+                        }
+
+                        var _1stTrader = trade.Token1Holder.Address;
+                        var _2ndTrader = trade.Token2Holder.Address;
+                        var _1stTraderIsContract = await _blockchainAccessor.IsSmartContractAsync(_1stTrader);
+                        var _2ndTraderIsContract = await _blockchainAccessor.IsSmartContractAsync(_2ndTrader);
+
+                        if (_2ndTraderIsContract && _2ndTraderIsContract)
+                        {
+                            continue;
+                        }
+
                         OnTrade?.Invoke(this, new OnTradeEventArgs() { Trade = trade });
                     }
                 }
@@ -111,19 +127,37 @@ namespace _0xTrader.Core.Services
 
         private async Task<Trade> ConstructTradeFromEvents(EventLog<TransferEvent> eventLog1, EventLog<TransferEvent> eventLog2, TransactionReceipt receipt)
         {
-            var token1 = await GetTokenByAddress(eventLog1.Log.Address);
-            var token2 = await GetTokenByAddress(eventLog2.Log.Address);
-            var token1Holder = new Trader()
+            var (success1, token1) = await _blockchainAccessor.TryGetTokenAsync(eventLog1.Log.Address);
+            var (success2, token2) = await _blockchainAccessor.TryGetTokenAsync(eventLog2.Log.Address);
+
+            if (!success1 || !success2 ||
+                string.Equals(token1.Symbol, token2.Symbol))
+            {
+                return null;
+            }
+
+            var token1Wallet = new Wallet()
             {
                 Token = token1,
-                Address = eventLog1.Event.To,
                 Balance = await _blockchainAccessor.GetBalanceAsync(eventLog1.Log.Address, eventLog1.Event.To),
             };
-            var token2Holder = new Trader()
+
+            var token2Wallet = new Wallet()
             {
                 Token = token2,
-                Address = eventLog2.Event.To,
                 Balance = await _blockchainAccessor.GetBalanceAsync(eventLog2.Log.Address, eventLog2.Event.To),
+            };
+
+            var token1Holder = new Trader()
+            {
+                Address = eventLog1.Event.To,
+                Wallets = new List<Wallet>() { token1Wallet },
+            };
+
+            var token2Holder = new Trader()
+            {
+                Address = eventLog2.Event.To,
+                Wallets = new List<Wallet>() { token2Wallet },
             };
 
             var trade = new Trade()
@@ -137,19 +171,6 @@ namespace _0xTrader.Core.Services
             };
 
             return trade;
-        }
-
-        private async Task<Token> GetTokenByAddress(string tokenAddress)
-        {
-            var token = new Token()
-            {
-                Address = tokenAddress,
-                Name = await _blockchainAccessor.GetNameAsync(tokenAddress),
-                Symbol = await _blockchainAccessor.GetSymbolAsync(tokenAddress),
-                Decimals = await _blockchainAccessor.GetDecimalsAsync(tokenAddress),
-            };
-
-            return token;
         }
     }
 }

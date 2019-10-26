@@ -1,4 +1,5 @@
 ﻿using _0xTrader.Core;
+using _0xTrader.Core.Models;
 using _0xTrader.Core.Services.Abstractions;
 using Castle.Windsor;
 using System;

@@ -1,4 +1,5 @@
 ﻿using _0xTrader.Core.Helpers;
+using _0xTrader.Core.Models;
 using _0xTrader.Core.Services.Abstractions;
 using Nethereum.Web3;
 using System;
@@ -26,39 +27,71 @@ namespace _0xTrader.Core.Services
             return await balanceFunc.CallAsync<BigInteger>(ownerAddress);
         }
 
-        public async Task<int> GetDecimalsAsync(string tokenAddress)
+        public async Task<BigInteger> GetDecimalsAsync(string tokenAddress)
         {
             var contract = _web3.Eth.GetContract(Constants.ERC20.Abi, tokenAddress);
-            var balanceFunc = contract.GetFunction(Constants.ERC20.DecimalsFunction);
+            var decimalFunc = contract.GetFunction(Constants.ERC20.DecimalsFunction);
+            var decimals = await decimalFunc.CallAsync<BigInteger>();
 
-            return await balanceFunc.CallAsync<int>();
+            return decimals;
         }
 
         public async Task<string> GetNameAsync(string tokenAddress)
         {
             var contract = _web3.Eth.GetContract(Constants.ERC20.Abi, tokenAddress);
-            var balanceFunc = contract.GetFunction(Constants.ERC20.NameFunction);
+            var nameFunc = contract.GetFunction(Constants.ERC20.NameFunction);
+            var name = await nameFunc.CallAsync<string>();
 
-            return await balanceFunc.CallAsync<string>();
+            return name;
         }
 
         public async Task<string> GetSymbolAsync(string tokenAddress)
         {
             var contract = _web3.Eth.GetContract(Constants.ERC20.Abi, tokenAddress);
-            var balanceFunc = contract.GetFunction(Constants.ERC20.SymbolFunction);
+            var symbolFunc = contract.GetFunction(Constants.ERC20.SymbolFunction);
+            var symbol = await symbolFunc.CallAsync<string>();
 
-            return await balanceFunc.CallAsync<string>();
+            return symbol;
         }
 
-        public async Task<bool> IsERC20Async(string address)
+        public async Task<bool> IsSmartContractAsync(string address)
         {
-            var name = await GetNameAsync(address);
-            if (string.IsNullOrEmpty(name))
+            var code = await _web3.Eth.GetCode.SendRequestAsync(address);
+            if (code == "0x")
             {
                 return false;
             }
+            else
+            {
+                return true;
+            }
+        }
 
-            return true;
+        public async Task<(bool, Token)> TryGetTokenAsync(string address)
+        {
+            try
+            {
+                var token = new Token()
+                {
+                    Address = address,
+                    Name = await GetNameAsync(address),
+                    Symbol = await GetSymbolAsync(address),
+                    Decimals = (int)await GetDecimalsAsync(address),
+                };
+
+                if (string.IsNullOrWhiteSpace(token.Name) ||
+                    string.IsNullOrWhiteSpace(token.Symbol) ||
+                    token.Decimals > byte.MaxValue)
+                {
+                    return (false, null);
+                }
+
+                return (true, token);
+            }
+            catch (Exception e) // TODO remove exc
+            {
+                return (false, null);
+            }
         }
     }
 }

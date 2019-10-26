@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _0xTrader.Core.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace _0xTrader.Core.Services.Abstractions
