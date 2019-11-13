@@ -15,12 +15,12 @@ namespace _0xTrader.Core.Services
             _blockchainAccessor = blockchainAccessor ?? throw new ArgumentNullException(nameof(blockchainAccessor));
         }
 
-        public Task<Token> GetTokenAsync(string tokenAddress)
+        public Task<Token> GetToken(string tokenAddress)
         {
             return Task.FromResult(Repo.Tokens[tokenAddress.ToLower()]);
         }
 
-        public Task RegisterTokenAsync(Token token)
+        public Task RegisterToken(Token token)
         {
             token.Address = token.Address.ToLower();
             Repo.Tokens[token.Address] = token;
@@ -35,7 +35,7 @@ namespace _0xTrader.Core.Services
                 throw new InvalidOperationException($"The address {tokenAddress} does not seem to be a token.");
             }
 
-            await RegisterTokenAsync(token);
+            await RegisterToken(token);
         }
 
         private static class Repo

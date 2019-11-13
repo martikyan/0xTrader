@@ -5,10 +5,9 @@ namespace _0xTrader.Core.Services.Abstractions
 {
     public interface IRepoAccessor
     {
-        Task RegisterTokenAsync(Token token);
-
-        Task RegisterTokenAsync(string tokenAddress);
-
-        Task<Token> GetTokenAsync(string tokenAddress);
+        void RegisterToken(Token token);
+        void RegisterTrade(Trade trade);
+        Token GetToken(string tokenAddress);
+        Trade[] GetAllTrades(string traderAddress);
     }
 }
